@@ -17,11 +17,11 @@ This VS Code extension automatically detects when GitHub Copilot is controlling 
 ### Technical Implementation
 - ✅ **TypeScript Extension**: Full TypeScript implementation with proper types
 - ✅ **VS Code API Integration**: Uses latest VS Code Extension API (v1.101.0)
-- ✅ **Environment Variable Collection**: Leverages `GlobalEnvironmentVariableCollection`
+- ✅ **File-based Detection**: Uses marker files for cross-shell compatibility
 - ✅ **Event Handling**: Proper event subscription and cleanup
 - ✅ **Memory Management**: Uses WeakSet for efficient terminal tracking
 - ✅ **Error Handling**: Comprehensive error handling and logging
-- ✅ **Testing**: Complete test suite with Jest
+- ✅ **Testing**: Complete test suite
 
 ### Documentation & Examples
 - ✅ **README.md**: Comprehensive documentation with installation and usage
@@ -42,12 +42,20 @@ npm run compile
 ```
 
 ### 2. Shell Configuration
-Add to your `~/.zshrc` or `~/.bashrc`:
+Add to your `~/.zshrc`:
 ```bash
-# Agent detection using environment variables set by VS Code extension
-if [[ "$IS_AGENT_SESSION" == "true" ]] || [[ "$TERMINAL_MODE" == "agent" ]]; then
-    export COPILOT_AGENT_DETECTED=true
+# Install Oh My Zsh plugin
+plugins=(... copilot-terminal-detection)
+
+# The plugin will automatically set COPILOT_AGENT_DETECTED
+# Use it in your shell configuration:
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
     export PS1="[🤖] $PS1"
+    echo "🤖 Copilot terminal detected"
+else
+    echo "💻 Regular terminal"
+fi
+```
     echo "🤖 Agent-controlled terminal detected"
 fi
 ```
@@ -74,13 +82,14 @@ The extension identifies Copilot terminals by checking for these patterns in ter
 - `ai assistant`
 - `chat participant`
 
-### Environment Variable Flow
+### File-based Detection Flow
 1. **Terminal Creation**: VS Code creates a new terminal
 2. **Event Trigger**: Extension receives `onDidOpenTerminal` event
 3. **Pattern Matching**: Extension analyzes terminal name and options
-4. **Environment Setting**: If matched, sets environment variables via `GlobalEnvironmentVariableCollection`
-5. **Shell Detection**: Shell reads environment variables on startup
-6. **Behavior Modification**: Shell modifies prompt, aliases, and behavior
+4. **Marker File Creation**: If matched, creates a marker file in system temp directory
+5. **Shell Detection**: Oh My Zsh plugin walks process tree to find marker files
+6. **Environment Variable Setting**: Plugin sets `COPILOT_AGENT_DETECTED` based on detection
+7. **Behavior Modification**: Shell modifies prompt, aliases, and behavior
 
 ## 🎮 Available Commands
 
