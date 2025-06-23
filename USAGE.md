@@ -285,7 +285,7 @@ fi
 
 ```bash
 # Different behaviors based on terminal type
-if [[ "$TERMINAL_MODE" == "agent" ]]; then
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
     # Agent-friendly settings
     export EDITOR="code --wait"
     export PAGER="less -R"
@@ -319,8 +319,12 @@ The extension provides these commands that you can access via the Command Palett
    - Manually check if the active terminal is controlled by Copilot
    - Useful for testing and debugging
 
-2. **Copilot Terminal Detection: Show Environment Variables**
-   - Display the current environment variables set by the extension
+2. **Copilot Terminal Detection: Create Marker File**
+   - Manually create a marker file for the active terminal
+   - Useful for testing and debugging
+
+3. **Copilot Terminal Detection: Show Marker File Status**
+   - Display the current marker files and their status
    - Helps verify the extension is working correctly
 
 ## Testing the Extension
@@ -328,9 +332,8 @@ The extension provides these commands that you can access via the Command Palett
 1. **Install and activate the extension**
 2. **Open a terminal normally** - should not show agent detection
 3. **Ask Copilot to open a terminal** (via chat or commands)
-4. **Check the terminal prompt** - should show `[🤖]` prefix if detected
-5. **Run `echo $IS_AGENT_SESSION`** - should output `true` for agent terminals
-6. **Run `echo $TERMINAL_MODE`** - should output `agent` for agent terminals
+4. **Check the terminal prompt** - should show `[🤖]` prefix if detected and Oh My Zsh plugin is configured
+5. **Run `echo $COPILOT_AGENT_DETECTED`** - should output `true` for agent terminals (when Oh My Zsh plugin is loaded)
 
 ## Troubleshooting
 
