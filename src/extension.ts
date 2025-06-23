@@ -14,6 +14,11 @@ const logger = {
 	error: (message: string, error?: any) => console.error(`[Error] ${message}`, error || '')
 };
 
+// Terminal detection patterns - defined once for efficiency
+const COPILOT_PATTERNS = ['copilot', 'agent', '@workspace', '@terminal', 'github copilot', 'ai assistant', 'chat participant'];
+const EXCLUDE_PATTERNS = ['zsh', 'bash', 'cmd', 'powershell', 'fish', 'sh'];
+const MARKER_PREFIX = '.vscode_copilot_agent_';
+
 export function activate(context: vscode.ExtensionContext) {
 	logger.info('Extension activating...');
 
@@ -96,7 +101,7 @@ function handleShowStatusCommand() {
 	try {
 		const tempDir = os.tmpdir();
 		const files = fs.readdirSync(tempDir);
-		const markerFiles = files.filter(f => f.startsWith('.vscode_copilot_agent_'));
+		const markerFiles = files.filter(f => f.startsWith(MARKER_PREFIX));
 		
 		if (markerFiles.length === 0) {
 			vscode.window.showInformationMessage('No Copilot marker files found');
@@ -125,20 +130,14 @@ function handleShowStatusCommand() {
  */
 function detectCopilotTerminal(terminal: vscode.Terminal): boolean {
 	const terminalName = terminal.name.toLowerCase().trim();
-	
-	// Patterns that indicate Copilot agent terminals
-	const copilotPatterns = ['copilot', 'agent', '@workspace', '@terminal', 'github copilot', 'ai assistant', 'chat participant'];
-	
-	// Patterns that should NOT be considered Copilot terminals
-	const excludePatterns = ['zsh', 'bash', 'cmd', 'powershell', 'fish', 'sh'];
 
 	// First check if this is a standard shell (exclusion takes priority)
-	if (excludePatterns.some(pattern => terminalName === pattern || terminalName.startsWith(pattern))) {
+	if (EXCLUDE_PATTERNS.some(pattern => terminalName === pattern || terminalName.startsWith(pattern))) {
 		return false;
 	}
 
 	// Check terminal name against Copilot patterns
-	let isCopilotTerminal = copilotPatterns.some(pattern => terminalName.includes(pattern));
+	let isCopilotTerminal = COPILOT_PATTERNS.some(pattern => terminalName.includes(pattern));
 
 	// Check creation options for additional detection
 	const creationOptions = terminal.creationOptions;
@@ -146,12 +145,12 @@ function detectCopilotTerminal(terminal: vscode.Terminal): boolean {
 		const optionsName = creationOptions.name.toLowerCase().trim();
 		
 		// Apply same exclusion logic to creation options
-		if (excludePatterns.some(pattern => optionsName === pattern || optionsName.startsWith(pattern))) {
+		if (EXCLUDE_PATTERNS.some(pattern => optionsName === pattern || optionsName.startsWith(pattern))) {
 			return false;
 		}
 		
 		// Check creation options against Copilot patterns
-		if (copilotPatterns.some(pattern => optionsName.includes(pattern))) {
+		if (COPILOT_PATTERNS.some(pattern => optionsName.includes(pattern))) {
 			isCopilotTerminal = true;
 		}
 	}
@@ -184,7 +183,7 @@ function createAgentMarkerFile(terminal: vscode.Terminal) {
 	}
 	
 	processId.then(pid => {
-		const markerPath = path.join(os.tmpdir(), `.vscode_copilot_agent_${pid}`);
+		const markerPath = path.join(os.tmpdir(), `${MARKER_PREFIX}${pid}`);
 		const markerData = {
 			isAgentSession: true,
 			terminalMode: 'agent',
@@ -213,7 +212,7 @@ function removeAgentMarkerFile(terminal: vscode.Terminal) {
 	}
 	
 	processId.then(pid => {
-		const markerPath = path.join(os.tmpdir(), `.vscode_copilot_agent_${pid}`);
+		const markerPath = path.join(os.tmpdir(), `${MARKER_PREFIX}${pid}`);
 		try {
 			if (fs.existsSync(markerPath)) {
 				fs.unlinkSync(markerPath);
@@ -232,7 +231,7 @@ function removeAllAgentMarkerFiles() {
 	try {
 		const tempDir = os.tmpdir();
 		const files = fs.readdirSync(tempDir);
-		const markerFiles = files.filter(f => f.startsWith('.vscode_copilot_agent_'));
+		const markerFiles = files.filter(f => f.startsWith(MARKER_PREFIX));
 		
 		markerFiles.forEach(file => {
 			const filePath = path.join(tempDir, file);
