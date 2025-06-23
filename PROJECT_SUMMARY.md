@@ -49,20 +49,17 @@ if [[ "$IS_AGENT_SESSION" == "true" ]] || [[ "$TERMINAL_MODE" == "agent" ]]; the
     export COPILOT_AGENT_DETECTED=true
     export PS1="[🤖] $PS1"
     echo "🤖 Agent-controlled terminal detected"
-else
-    export COPILOT_AGENT_DETECTED=false
 fi
 ```
 
 ### 3. Testing
 ```bash
-# Run the demo script
-./demo.sh
-
-# Or test manually
-echo "IS_AGENT_SESSION: $IS_AGENT_SESSION"
-echo "TERMINAL_MODE: $TERMINAL_MODE"
+# Check the detection status
 echo "COPILOT_AGENT_DETECTED: $COPILOT_AGENT_DETECTED"
+
+# Test in different terminal types
+# Copilot terminal should show: COPILOT_AGENT_DETECTED=true
+# Regular terminal should show: COPILOT_AGENT_DETECTED=false
 ```
 
 ## 🔧 Architecture
@@ -116,8 +113,10 @@ The extension identifies Copilot terminals by checking for these patterns in ter
 ├── README.md                   # Main documentation
 ├── CHANGELOG.md               # Version history
 ├── USAGE.md                   # Usage examples
-├── demo.sh                    # Demo script
-└── shell-integration.sh       # Shell configuration
+└── oh-my-zsh-plugin/           # Oh My Zsh plugin for shell integration
+    ├── copilot-terminal-detection.plugin.zsh
+    ├── README.md
+    └── examples.zsh
 ```
 
 ## 🧪 Testing Results

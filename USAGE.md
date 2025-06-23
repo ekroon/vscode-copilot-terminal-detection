@@ -2,23 +2,225 @@
 
 This document provides examples of how to use the Copilot Terminal Detection extension.
 
-## Basic Shell Integration
+## Oh My Zsh Plugin (Recommended)
+
+The easiest way to use this extension is through the Oh My Zsh plugin.
+
+### Installation
+
+1. Copy the plugin to your Oh My Zsh custom plugins directory:
+   ```bash
+   mkdir -p ~/.oh-my-zsh/custom/plugins/copilot-terminal-detection
+   cp oh-my-zsh-plugin/copilot-terminal-detection.plugin.zsh ~/.oh-my-zsh/custom/plugins/copilot-terminal-detection/
+   ```
+
+2. Add the plugin to your `~/.zshrc` file:
+   ```bash
+   plugins=(... copilot-terminal-detection)
+   ```
+
+3. Reload your shell:
+   ```bash
+   source ~/.zshrc
+   ```
+
+### Usage
+
+The plugin automatically sets the `COPILOT_AGENT_DETECTED` environment variable:
+
+```bash
+# Check if running in a Copilot terminal
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
+    echo "🤖 This is a Copilot-controlled terminal"
+else
+    echo "💻 This is a regular terminal"
+fi
+```
+
+## Practical .zshrc Integration Examples
+
+Here are real-world examples of how to integrate the Copilot terminal detection into your `~/.zshrc`:
+
+### Example 1: Enhanced Prompt with Agent Indicator
+
+```bash
+# Add to your ~/.zshrc
+plugins=(... copilot-terminal-detection)
+
+# Load Oh My Zsh (this loads the plugins and sets COPILOT_AGENT_DETECTED)
+source $ZSH/oh-my-zsh.sh
+
+# Now customize prompt based on terminal type (after plugins are loaded)
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
+    # Agent-controlled terminal - bright cyan with robot emoji
+    PROMPT='%F{cyan}[🤖 AI]%f %F{green}%n@%m%f:%F{blue}%~%f$ '
+    # Optional: Set right prompt with additional info
+    RPROMPT='%F{magenta}[Agent Mode]%f'
+else
+    # Regular terminal - standard colors
+    PROMPT='%F{green}%n@%m%f:%F{blue}%~%f$ '
+fi
+```
+
+### Example 2: Agent-Friendly Aliases and Functions
+
+```bash
+# Add to your ~/.zshrc
+plugins=(... copilot-terminal-detection)
+
+# Load Oh My Zsh first
+source $ZSH/oh-my-zsh.sh
+
+# Set up agent-specific aliases when in Copilot terminal (after plugin loads)
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
+    # More verbose and colorful output for AI readability
+    alias ll='ls -laGF'
+    alias ls='ls -GF'
+    alias grep='grep --color=always'
+    alias cat='cat -n'  # Show line numbers
+    alias tree='tree -C -L 2'  # Colored tree with depth limit
+    
+    # Agent-friendly git aliases
+    alias gst='git status --porcelain=v1'
+    alias glog='git log --oneline --graph --decorate -10'
+    alias gdiff='git diff --color=always'
+    
+    # Helper function for AI context
+    whereami() {
+        echo "📍 Current Context:"
+        echo "Directory: $(pwd)"
+        echo "Git branch: $(git branch --show-current 2>/dev/null || echo 'not a git repo')"
+        echo "Files: $(ls -1 | wc -l | tr -d ' ') items"
+        echo "Disk usage: $(du -sh . 2>/dev/null | cut -f1)"
+    }
+else
+    # Standard aliases for regular terminal use
+    alias ll='ls -la'
+    alias ls='ls'
+fi
+```
+
+### Example 3: Conditional Oh My Zsh Theme
+
+```bash
+# Add to your ~/.zshrc
+plugins=(... copilot-terminal-detection)
+
+# Load Oh My Zsh first
+source $ZSH/oh-my-zsh.sh
+
+# Choose theme based on terminal type (after plugin detection)
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
+    # Override prompt for agent mode (since theme is already loaded)
+    PROMPT='%F{cyan}[🤖]%f '"$PROMPT"
+    
+    # Or you can set a completely custom prompt
+    PROMPT='%F{cyan}[🤖 AI]%f %F{green}%n@%m%f:%F{blue}%~%f$(git_prompt_info) $ '
+else
+    # Keep the default theme prompt
+    # PROMPT remains as set by ZSH_THEME
+fi
+```
+
+### Example 4: Environment Variables and Path Modifications
+
+```bash
+# Add to your ~/.zshrc
+plugins=(... copilot-terminal-detection)
+
+# Load Oh My Zsh first
+source $ZSH/oh-my-zsh.sh
+
+# Configure environment after plugin detection
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
+    # Set environment variables for agent-friendly behavior
+    export PAGER="less -R"  # Always use colors in pager
+    export GREP_OPTIONS="--color=always"
+    export TREE_COLORS="1"
+    export CLICOLOR=1
+    export LSCOLORS="ExFxCxDxBxegedabagacad"
+    
+    # Add useful tools to PATH if they exist
+    [[ -d "/usr/local/bin" ]] && export PATH="/usr/local/bin:$PATH"
+    [[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
+    
+    # Set up auto-completion for agent terminals
+    autoload -U compinit && compinit
+    zstyle ':completion:*' menu select
+    zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+fi
+```
+
+### Example 5: Conditional Plugin Loading
+
+```bash
+# Add to your ~/.zshrc - Load different plugins based on terminal type
+# Note: For this example, you'd need to detect before loading Oh My Zsh
+# This is more advanced and requires sourcing the plugin detection directly
+
+# First, manually source the detection plugin to get COPILOT_AGENT_DETECTED early
+source ~/.oh-my-zsh/custom/plugins/copilot-terminal-detection/copilot-terminal-detection.plugin.zsh
+
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
+    # Load plugins useful for AI/agent interaction
+    plugins=(
+        git
+        docker
+        kubectl
+        npm
+        node
+        python
+        copilot-terminal-detection
+        zsh-syntax-highlighting
+        zsh-autosuggestions
+    )
+else
+    # Minimal plugins for regular terminal use
+    plugins=(
+        git
+        copilot-terminal-detection
+    )
+fi
+
+# Now load Oh My Zsh with the conditional plugins
+source $ZSH/oh-my-zsh.sh
+```
+
+### Example 6: Agent Mode Notification
+
+```bash
+# Add to your ~/.zshrc
+plugins=(... copilot-terminal-detection)
+
+# Load Oh My Zsh first
+source $ZSH/oh-my-zsh.sh
+
+# Show a welcome message for agent terminals (after detection)
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
+    echo "🤖 AI Agent Terminal Active"
+    echo "   • Enhanced output formatting enabled"
+    echo "   • Verbose aliases loaded"
+    echo "   • Type 'whereami' for context info"
+    echo ""
+fi
+```
+
+## Manual Integration (Alternative)
+
+If you don't use Oh My Zsh, you can source the plugin directly:
 
 ### For Zsh users (macOS default)
 
 Add to your `~/.zshrc`:
 
 ```bash
-# Source the shell integration from the extension
-source /path/to/extension/shell-integration.sh
+# Source the Copilot detection plugin
+source /path/to/oh-my-zsh-plugin/copilot-terminal-detection.plugin.zsh
 
-# Or use the simple version:
-if [[ "$IS_AGENT_SESSION" == "true" ]] || [[ "$TERMINAL_MODE" == "agent" ]]; then
-    export COPILOT_AGENT_DETECTED=true
+# Use the detection result
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
     export PS1="[🤖] $PS1"
     echo "🤖 Agent-controlled terminal detected"
-else
-    export COPILOT_AGENT_DETECTED=false
 fi
 ```
 
@@ -27,16 +229,13 @@ fi
 Add to your `~/.bashrc`:
 
 ```bash
-# Source the shell integration from the extension
-source /path/to/extension/shell-integration.sh
+# Source the Copilot detection plugin (works in bash too)
+source /path/to/oh-my-zsh-plugin/copilot-terminal-detection.plugin.zsh
 
-# Or use the simple version:
-if [[ "$IS_AGENT_SESSION" == "true" ]] || [[ "$TERMINAL_MODE" == "agent" ]]; then
-    export COPILOT_AGENT_DETECTED=true
+# Use the detection result
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
     export PS1="[🤖] $PS1"
     echo "🤖 Agent-controlled terminal detected"
-else
-    export COPILOT_AGENT_DETECTED=false
 fi
 ```
 

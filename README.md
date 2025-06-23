@@ -1,17 +1,18 @@
 # Copilot Terminal Detection
 
-A VS Code extension that automatically detects when GitHub Copilot is controlling the terminal and sets environment variables that the shell can read to modify its behavior accordingly.
+A VS Code extension that automatically detects when GitHub Copilot is controlling the terminal and provides shell integration through an Oh My Zsh plugin.
 
 ## Features
 
 - **Automatic Detection**: Automatically detects when terminals are opened by Copilot agents
-- **Environment Variables**: Sets `IS_AGENT_SESSION=true` and `TERMINAL_MODE=agent` for Copilot-controlled terminals
-- **Shell Integration**: Provides shell configuration for seamless integration
-- **Manual Commands**: Includes commands for manual detection and environment variable inspection
+- **Per-Terminal Detection**: Each terminal is independently detected (not global)
+- **Oh My Zsh Plugin**: Easy integration with Oh My Zsh through a custom plugin
+- **Environment Variable**: Sets `COPILOT_AGENT_DETECTED` for shell scripts to use
+- **Safe Operation**: Won't break if the extension isn't loaded
 
 ## How It Works
 
-The extension monitors terminal creation events using VS Code's `onDidOpenTerminal` API and analyzes terminal names and creation options to identify Copilot-initiated terminals. When a Copilot terminal is detected, it automatically sets environment variables using VS Code's `GlobalEnvironmentVariableCollection` API.
+The extension monitors terminal creation events and creates unique marker files for each Copilot terminal using their process ID. The Oh My Zsh plugin checks for these marker files by walking up the process tree to determine if the current shell is running under a Copilot terminal.
 
 ### Detection Logic
 
@@ -24,32 +25,56 @@ The extension identifies Copilot terminals by checking for patterns in terminal 
 - `ai assistant`
 - `chat participant`
 
-## Shell Integration
+## Installation
 
-Add this configuration to your `~/.zshrc` file to detect agent-controlled terminals:
+### 1. Install the VS Code Extension
+
+Install the extension from the VS Code marketplace or package it locally:
 
 ```bash
-# Agent detection using environment variables set by VS Code extension
-if [[ "$IS_AGENT_SESSION" == "true" ]] || [[ "$TERMINAL_MODE" == "agent" ]]; then
-    export COPILOT_AGENT_DETECTED=true
-    export PS1="[🤖] $PS1"
-    echo "🤖 Agent-controlled terminal detected"
+npm install
+npm run compile
+npx vsce package
+code --install-extension copilot-terminal-detection-*.vsix
+```
+
+### 2. Install the Oh My Zsh Plugin
+
+1. Copy the plugin to your Oh My Zsh custom plugins directory:
+   ```bash
+   mkdir -p ~/.oh-my-zsh/custom/plugins/copilot-terminal-detection
+   cp oh-my-zsh-plugin/copilot-terminal-detection.plugin.zsh ~/.oh-my-zsh/custom/plugins/copilot-terminal-detection/
+   ```
+
+2. Add the plugin to your `~/.zshrc` file:
+   ```bash
+   plugins=(... copilot-terminal-detection)
+   ```
+
+3. Reload your shell:
+   ```bash
+   source ~/.zshrc
+   ```
+
+## Usage
+
+The plugin automatically sets the `COPILOT_AGENT_DETECTED` environment variable:
+
+```bash
+# Check if running in a Copilot terminal
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
+    echo "🤖 This is a Copilot-controlled terminal"
 else
-    export COPILOT_AGENT_DETECTED=false
+    echo "💻 This is a regular terminal"
 fi
 ```
 
-For Bash users, add to `~/.bashrc`:
+### Custom Prompt
 
 ```bash
-# Agent detection using environment variables set by VS Code extension
-if [[ "$IS_AGENT_SESSION" == "true" ]] || [[ "$TERMINAL_MODE" == "agent" ]]; then
-    export COPILOT_AGENT_DETECTED=true
-    export PS1="[🤖] $PS1"
-    echo "🤖 Agent-controlled terminal detected"
-else
-    export COPILOT_AGENT_DETECTED=false
-fi
+# Add to your ~/.zshrc for custom prompt
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
+    PS1="[🤖] $PS1"
 ```
 
 ## Commands
@@ -57,14 +82,8 @@ fi
 The extension provides the following commands:
 
 - `Copilot Terminal Detection: Detect Copilot Terminal` - Manually detect if the active terminal is from Copilot
-- `Copilot Terminal Detection: Show Environment Variables` - Display currently set environment variables
-
-## Installation
-
-1. Clone this repository
-2. Run `npm install` to install dependencies
-3. Press `F5` to run the extension in a new Extension Development Host window
-4. Test the extension by opening terminals through Copilot
+- `Copilot Terminal Detection: Create Marker` - Manually create a marker file for testing
+- `Copilot Terminal Detection: Show Status` - Display current marker files and their status
 
 ## Development
 
