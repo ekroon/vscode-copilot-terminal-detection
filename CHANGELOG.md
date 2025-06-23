@@ -1,36 +1,41 @@
 # Change Log
 
-All notable changes to the "copilot-terminal-detection" extension will be documented in this file.
+All notable changes to the "Copilot Terminal Detection" extension will be documented in this file.
 
-## [0.0.1] - 2025-06-23
+## [0.1.0] - 2025-06-23
 
 ### Added
-- Initial release of Copilot Terminal Detection extension
-- Automatic detection of terminals opened by GitHub Copilot agents
-- Environment variable setting (`IS_AGENT_SESSION=true`, `TERMINAL_MODE=agent`)
-- Terminal creation event monitoring using VS Code's `onDidOpenTerminal` API
-- Pattern-based detection for Copilot-related terminal names
-- Commands for manual detection and environment variable inspection:
-  - `Copilot Terminal Detection: Detect Copilot Terminal`
-  - `Copilot Terminal Detection: Show Environment Variables`
-- Shell integration configuration for Zsh and Bash
-- Comprehensive documentation and usage examples
-- Demo script for testing functionality
-- TypeScript implementation with proper error handling
-- Extension tests with Jest framework
+- ✨ Initial release of Copilot Terminal Detection extension
+- 🔍 Automatic detection of GitHub Copilot controlled terminals
+- 🎯 Per-terminal detection using process-based marker files
+- 🐚 Complete Oh My Zsh plugin for seamless shell integration
+- ⚡ `COPILOT_AGENT_DETECTED` environment variable for shell customization
+- 🛡️ Safe operation that won't break if extension isn't loaded
+- 📝 Comprehensive documentation and usage examples
+- 🎨 Custom icon and marketplace-ready packaging
 
 ### Features
-- **Automatic Detection**: Monitors terminal creation and identifies Copilot-controlled terminals
-- **Environment Variables**: Sets environment variables automatically for shell integration
-- **Shell Integration**: Provides ready-to-use shell configuration snippets
-- **Manual Commands**: Includes commands for testing and debugging
-- **Cross-Shell Support**: Works with Zsh, Bash, and other shells
-- **Lightweight**: Minimal performance impact with efficient detection logic
+- Process-based terminal detection (not global)
+- Marker files stored in system temp directory
+- Shell integration through Oh My Zsh plugin
+- Support for custom prompts, aliases, and shell behavior
+- Automatic cleanup of marker files on terminal close
+- Extension commands for manual testing and status checking
+
+### Commands
+- `Copilot Terminal Detection: Detect Copilot Terminal` - Manual detection
+- `Copilot Terminal Detection: Create Marker File` - Testing utility
+- `Copilot Terminal Detection: Show Marker File Status` - Debug information
 
 ### Technical Details
-- Uses VS Code Extension API v1.101.0
-- Implements `GlobalEnvironmentVariableCollection` for environment variable management
-- Pattern matching for terminal name detection
-- WeakSet for efficient terminal tracking
-- TypeScript with Webpack bundling
-- Comprehensive test suite
+- Uses VS Code's `onDidOpenTerminal` and `onDidCloseTerminal` APIs
+- Detects Copilot terminals by name patterns (copilot, agent, @workspace, etc.)
+- Creates unique marker files per terminal process ID
+- Oh My Zsh plugin walks process tree for detection
+- Cross-platform support (macOS, Linux, Windows WSL)
+
+## [Unreleased]
+- Potential features for future releases
+- Additional shell integrations (bash, fish)
+- More customization options
+- Enhanced terminal detection patterns

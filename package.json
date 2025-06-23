@@ -1,8 +1,32 @@
 {
   "name": "copilot-terminal-detection",
   "displayName": "Copilot Terminal Detection",
-  "description": "Automatically detects when GitHub Copilot is controlling the terminal and sets environment variables",
-  "version": "0.0.1",
+  "description": "Automatically detects when GitHub Copilot is controlling the terminal and provides shell integration",
+  "version": "0.1.0",
+  "publisher": "erwinkroon",
+  "author": "Erwin Kroon",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ekroon/vscode-copilot-terminal-detection.git"
+  },
+  "homepage": "https://github.com/ekroon/vscode-copilot-terminal-detection#readme",
+  "bugs": {
+    "url": "https://github.com/ekroon/vscode-copilot-terminal-detection/issues"
+  },
+  "keywords": [
+    "copilot",
+    "terminal",
+    "ai",
+    "detection",
+    "github-copilot",
+    "shell",
+    "zsh",
+    "oh-my-zsh",
+    "automation",
+    "developer-tools"
+  ],
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.101.0"
   },
@@ -18,6 +42,11 @@
       {
         "command": "copilot-terminal-detection.detectCopilot",
         "title": "Detect Copilot Terminal",
+        "category": "Copilot Terminal Detection"
+      },
+      {
+        "command": "copilot-terminal-detection.createMarker",
+        "title": "Create Marker File",
         "category": "Copilot Terminal Detection"
       },
       {

@@ -1,0 +1,28 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="60" fill="#1e1e1e" stroke="#007acc" stroke-width="4"/>
+  
+  <!-- Terminal window -->
+  <rect x="20" y="35" width="88" height="58" rx="4" fill="#2d2d30" stroke="#3c3c3c" stroke-width="1"/>
+  
+  <!-- Terminal header -->
+  <rect x="20" y="35" width="88" height="12" rx="4" fill="#3c3c3c"/>
+  
+  <!-- Terminal dots -->
+  <circle cx="28" cy="41" r="2" fill="#ff605c"/>
+  <circle cx="36" cy="41" r="2" fill="#ffbd44"/>
+  <circle cx="44" cy="41" r="2" fill="#00ca4e"/>
+  
+  <!-- Terminal text lines -->
+  <rect x="26" y="54" width="30" height="2" fill="#4ec9b0"/>
+  <rect x="26" y="60" width="45" height="2" fill="#d4d4d4"/>
+  <rect x="26" y="66" width="25" height="2" fill="#569cd6"/>
+  <rect x="26" y="72" width="35" height="2" fill="#d4d4d4"/>
+  
+  <!-- Robot/AI indicator -->
+  <circle cx="90" cy="58" r="8" fill="#007acc"/>
+  <text x="90" y="63" text-anchor="middle" font-family="Arial" font-size="10" fill="white">🤖</text>
+  
+  <!-- Connection line from terminal to robot -->
+  <path d="M 76 65 Q 82 62 82 58" stroke="#007acc" stroke-width="2" fill="none" stroke-dasharray="2,2"/>
+</svg>

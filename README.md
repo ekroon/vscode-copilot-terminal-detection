@@ -1,33 +1,42 @@
 # Copilot Terminal Detection
 
-A VS Code extension that automatically detects when GitHub Copilot is controlling the terminal and provides shell integration through an Oh My Zsh plugin.
+[![Version](https://img.shields.io/visual-studio-marketplace/v/erwinkroon.copilot-terminal-detection)](https://marketplace.visualstudio.com/items?itemName=erwinkroon.copilot-terminal-detection)
+[![Downloads](https://img.shields.io/visual-studio-marketplace/d/erwinkroon.copilot-terminal-detection)](https://marketplace.visualstudio.com/items?itemName=erwinkroon.copilot-terminal-detection)
+[![Rating](https://img.shields.io/visual-studio-marketplace/r/erwinkroon.copilot-terminal-detection)](https://marketplace.visualstudio.com/items?itemName=erwinkroon.copilot-terminal-detection)
 
-## Features
+A VS Code extension that automatically detects when GitHub Copilot is controlling the terminal and provides seamless shell integration through an Oh My Zsh plugin.
 
-- **Automatic Detection**: Automatically detects when terminals are opened by Copilot agents
-- **Per-Terminal Detection**: Each terminal is independently detected (not global)
-- **Oh My Zsh Plugin**: Easy integration with Oh My Zsh through a custom plugin
-- **Environment Variable**: Sets `COPILOT_AGENT_DETECTED` for shell scripts to use
-- **Safe Operation**: Won't break if the extension isn't loaded
+## ✨ Features
 
-## How It Works
+- **🔍 Automatic Detection**: Instantly detects when terminals are opened by Copilot agents
+- **🎯 Per-Terminal Precision**: Each terminal is independently detected (not global)
+- **🐚 Oh My Zsh Integration**: Easy setup with a custom Oh My Zsh plugin
+- **⚡ Environment Variables**: Sets `COPILOT_AGENT_DETECTED` for shell customization
+- **🛡️ Safe Operation**: Won't break if the extension isn't loaded
+- **🎨 Customizable**: Modify prompts, aliases, and behavior per terminal type
 
-The extension monitors terminal creation events and creates unique marker files for each Copilot terminal using their process ID. The Oh My Zsh plugin checks for these marker files by walking up the process tree to determine if the current shell is running under a Copilot terminal.
+## 🚀 Quick Start
 
-### Detection Logic
+### 1. Install the Extension
+Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=erwinkroon.copilot-terminal-detection) or search for "Copilot Terminal Detection" in VS Code.
 
-The extension identifies Copilot terminals by checking for patterns in terminal names:
-- `copilot`
-- `agent`
-- `@workspace`
-- `@terminal`
-- `github copilot`
-- `ai assistant`
-- `chat participant`
+### 2. Install the Oh My Zsh Plugin
+```bash
+# Copy the plugin to your Oh My Zsh directory
+mkdir -p ~/.oh-my-zsh/custom/plugins/copilot-terminal-detection
+cp oh-my-zsh-plugin/copilot-terminal-detection.plugin.zsh ~/.oh-my-zsh/custom/plugins/copilot-terminal-detection/
 
-## Installation
+# Add to your ~/.zshrc
+plugins=(... copilot-terminal-detection)
 
-### 1. Install the VS Code Extension
+# Reload your shell
+source ~/.zshrc
+```
+
+### 3. Enjoy the Magic! ✨
+- Open a Copilot terminal → See `🤖` indicators
+- Open a regular terminal → Normal behavior
+- Customize your experience with the environment variable
 
 Install the extension from the VS Code marketplace or package it locally:
 
