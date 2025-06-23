@@ -285,7 +285,7 @@ fi
 
 ```bash
 # Different behaviors based on terminal type
-if [[ "$TERMINAL_MODE" == "agent" ]]; then
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
     # Agent-friendly settings
     export EDITOR="code --wait"
     export PAGER="less -R"

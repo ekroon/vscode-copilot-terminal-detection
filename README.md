@@ -38,36 +38,9 @@ source ~/.zshrc
 - Open a regular terminal → Normal behavior
 - Customize your experience with the environment variable
 
-Install the extension from the VS Code marketplace or package it locally:
-
-```bash
-npm install
-npm run compile
-npx vsce package
-code --install-extension copilot-terminal-detection-*.vsix
-```
-
-### 2. Install the Oh My Zsh Plugin
-
-1. Copy the plugin to your Oh My Zsh custom plugins directory:
-   ```bash
-   mkdir -p ~/.oh-my-zsh/custom/plugins/copilot-terminal-detection
-   cp oh-my-zsh-plugin/copilot-terminal-detection.plugin.zsh ~/.oh-my-zsh/custom/plugins/copilot-terminal-detection/
-   ```
-
-2. Add the plugin to your `~/.zshrc` file:
-   ```bash
-   plugins=(... copilot-terminal-detection)
-   ```
-
-3. Reload your shell:
-   ```bash
-   source ~/.zshrc
-   ```
-
 ## Usage
 
-The plugin automatically sets the `COPILOT_AGENT_DETECTED` environment variable:
+The extension automatically sets the `COPILOT_AGENT_DETECTED` environment variable:
 
 ```bash
 # Check if running in a Copilot terminal
@@ -84,6 +57,7 @@ fi
 # Add to your ~/.zshrc for custom prompt
 if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
     PS1="[🤖] $PS1"
+fi
 ```
 
 ## Commands
@@ -97,19 +71,16 @@ The extension provides the following commands:
 ## Development
 
 ### Building
-
 ```bash
 npm run compile
 ```
 
 ### Testing
-
 ```bash
 npm run test
 ```
 
 ### Packaging
-
 ```bash
 npm run package
 ```
@@ -118,20 +89,11 @@ npm run package
 
 The extension works out of the box with no configuration required. It automatically activates when VS Code starts and begins monitoring terminal creation events.
 
-## Environment Variables Set
-
-When a Copilot terminal is detected, the following environment variables are set:
-
-- `IS_AGENT_SESSION=true` - Indicates the terminal is controlled by an agent
-- `TERMINAL_MODE=agent` - Specifies the terminal mode as agent-controlled
-
-These variables are available to shell scripts and can be used to modify shell behavior, prompts, or other terminal-related functionality.
-
 ## Technical Details
 
 The extension uses:
 - VS Code's `window.onDidOpenTerminal` event to monitor terminal creation
-- `GlobalEnvironmentVariableCollection` API to set environment variables
+- File-based detection approach using marker files in the system temp directory
 - Terminal name and creation option analysis for detection
 - WeakSet to track Copilot terminals for cleanup
 
