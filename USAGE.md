@@ -285,7 +285,7 @@ fi
 
 ```bash
 # Different behaviors based on terminal type
-if [[ "$TERMINAL_MODE" == "agent" ]]; then
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
     # Agent-friendly settings
     export EDITOR="code --wait"
     export PAGER="less -R"
@@ -328,9 +328,9 @@ The extension provides these commands that you can access via the Command Palett
 1. **Install and activate the extension**
 2. **Open a terminal normally** - should not show agent detection
 3. **Ask Copilot to open a terminal** (via chat or commands)
-4. **Check the terminal prompt** - should show `[🤖]` prefix if detected
-5. **Run `echo $IS_AGENT_SESSION`** - should output `true` for agent terminals
-6. **Run `echo $TERMINAL_MODE`** - should output `agent` for agent terminals
+4. **Check the terminal environment** - should show detection
+5. **Run `echo $COPILOT_AGENT_DETECTED`** - should output `true` for agent terminals
+6. **Verify shell customization** - custom aliases and settings should be active
 
 ## Troubleshooting
 
