@@ -1,5 +1,3 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -9,29 +7,19 @@ import * as os from 'os';
 const copilotTerminals = new WeakSet<vscode.Terminal>();
 
 // This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Copilot Terminal Detection extension is now active!');
-
-	// File-based detection approach (no environment variables due to VS Code API limitations)
-	removeAllAgentMarkerFiles(); // Clean up any existing markers
-	console.log('Using file-based detection approach only');
+	// Clean up any existing marker files on startup
+	removeAllAgentMarkerFiles();
 
 	// Listen for terminal creation events
 	const terminalOpenDisposable = vscode.window.onDidOpenTerminal((terminal) => {
 		// Delay the detection to allow terminal to fully initialize
 		setTimeout(() => {
-			console.log(`Processing terminal creation event for: ${terminal.name}`);
 			const isCopilot = detectCopilotTerminal(terminal);
-			console.log(`Detection result for ${terminal.name}: ${isCopilot}`);
 			
 			if (isCopilot) {
-				// Create marker file for file-based detection
-				console.log(`About to create marker file for terminal: ${terminal.name}`);
 				createAgentMarkerFile(terminal);
-				console.log(`Copilot terminal detected: ${terminal.name}, marker file creation attempted`);
-			} else {
-				console.log(`Non-Copilot terminal: ${terminal.name}, no marker file created`);
+				console.log(`Copilot terminal detected: ${terminal.name}`);
 			}
 		}, 200);
 	});
@@ -40,37 +28,18 @@ export function activate(context: vscode.ExtensionContext) {
 	const terminalCloseDisposable = vscode.window.onDidCloseTerminal((terminal) => {
 		if (copilotTerminals.has(terminal)) {
 			copilotTerminals.delete(terminal);
-			console.log(`Copilot terminal closed: ${terminal.name}`);
-			
-			// Remove the marker file for this specific terminal
 			removeAgentMarkerFile(terminal);
 		}
 	});
 
 	// Check existing terminals when extension activates
-	let foundCopilotTerminals = false;
 	vscode.window.terminals.forEach(terminal => {
-		console.log(`Checking existing terminal during activation: ${terminal.name}`);
-		const isCopilot = detectCopilotTerminal(terminal);
-		if (isCopilot) {
-			foundCopilotTerminals = true;
-			console.log(`Found existing Copilot terminal during activation: ${terminal.name}`);
+		if (detectCopilotTerminal(terminal)) {
+			createAgentMarkerFile(terminal);
 		}
 	});
 
-	// Create marker file if we found any Copilot terminals during activation
-	if (foundCopilotTerminals) {
-		console.log('Creating marker files for existing Copilot terminals');
-		vscode.window.terminals.forEach(terminal => {
-			if (copilotTerminals.has(terminal)) {
-				createAgentMarkerFile(terminal);
-			}
-		});
-	}
-
-	console.log('Extension fully activated with terminal monitoring enabled');
-
-	// Register command for manual detection (for testing)
+	// Register commands
 	const detectCommand = vscode.commands.registerCommand('copilot-terminal-detection.detectCopilot', () => {
 		const activeTerminal = vscode.window.activeTerminal;
 		if (activeTerminal) {
@@ -85,9 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	// Register command to manually create marker file (for testing)
 	const createMarkerCommand = vscode.commands.registerCommand('copilot-terminal-detection.createMarker', () => {
-		console.log('Manual marker file creation requested');
 		const activeTerminal = vscode.window.activeTerminal;
 		if (activeTerminal) {
 			createAgentMarkerFile(activeTerminal);
@@ -97,7 +64,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	// Register command to check marker file status (for testing)
 	const showStatusCommand = vscode.commands.registerCommand('copilot-terminal-detection.showStatus', () => {
 		const tempDir = os.tmpdir();
 		try {
@@ -136,15 +102,10 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 /**
- * Detects if a terminal was created by a Copilot agent (file-based detection only)
+ * Detects if a terminal was created by a Copilot agent
  */
 function detectCopilotTerminal(terminal: vscode.Terminal): boolean {
-	// Check terminal name for Copilot-related patterns
 	const terminalName = terminal.name.toLowerCase().trim();
-	
-	console.log(`=== TERMINAL DETECTION DEBUG ===`);
-	console.log(`Terminal name: "${terminal.name}" (normalized: "${terminalName}")`);
-	console.log(`Terminal creation options:`, terminal.creationOptions);
 	
 	// Common patterns that indicate Copilot agent terminals
 	const copilotPatterns = [
@@ -167,78 +128,51 @@ function detectCopilotTerminal(terminal: vscode.Terminal): boolean {
 		'sh'
 	];
 
-	console.log(`Checking against copilot patterns:`, copilotPatterns);
-	console.log(`Checking against exclude patterns:`, excludePatterns);
-
 	// First check if this is a standard shell that should be excluded
-	const isStandardShell = excludePatterns.some(pattern => {
-		const match = terminalName === pattern || terminalName.startsWith(pattern);
-		console.log(`  - "${terminalName}" vs "${pattern}": ${match}`);
-		return match;
-	});
+	const isStandardShell = excludePatterns.some(pattern => 
+		terminalName === pattern || terminalName.startsWith(pattern)
+	);
 
 	if (isStandardShell) {
-		console.log(`❌ Standard shell detected (excluded): ${terminal.name}`);
 		return false;
 	}
 
 	// Check terminal name against Copilot patterns
-	let isCopilotTerminal = false;
-	copilotPatterns.forEach(pattern => {
-		const match = terminalName.includes(pattern);
-		console.log(`  + "${terminalName}" includes "${pattern}": ${match}`);
-		if (match) {
-			isCopilotTerminal = true;
-		}
-	});
+	let isCopilotTerminal = copilotPatterns.some(pattern => 
+		terminalName.includes(pattern)
+	);
 
 	// Check creation options for additional clues
 	const creationOptions = terminal.creationOptions;
 	if (creationOptions && 'name' in creationOptions && creationOptions.name) {
 		const optionsName = creationOptions.name.toLowerCase().trim();
-		console.log(`Creation options name: "${creationOptions.name}" (normalized: "${optionsName}")`);
 		
 		// Double-check exclusions for creation options
-		const optionsIsStandardShell = excludePatterns.some(pattern => {
-			const match = optionsName === pattern || optionsName.startsWith(pattern);
-			console.log(`  - Creation options "${optionsName}" vs "${pattern}": ${match}`);
-			return match;
-		});
+		const optionsIsStandardShell = excludePatterns.some(pattern => 
+			optionsName === pattern || optionsName.startsWith(pattern)
+		);
 		
 		if (optionsIsStandardShell) {
-			console.log(`❌ Standard shell detected in creation options (excluded): ${creationOptions.name}`);
 			return false;
 		}
 		
 		// Check creation options against Copilot patterns
-		copilotPatterns.forEach(pattern => {
-			const match = optionsName.includes(pattern);
-			console.log(`  + Creation options "${optionsName}" includes "${pattern}": ${match}`);
-			if (match) {
-				isCopilotTerminal = true;
-			}
-		});
-	}
-
-	// Additional heuristics: check if terminal has specific environment variables already set
-	if (creationOptions && 'env' in creationOptions && creationOptions.env) {
-		const env = creationOptions.env;
-		console.log(`Creation options env variables:`, Object.keys(env));
-		// Check for existing Copilot-related environment variables
-		if (env['COPILOT_AGENT'] || env['GITHUB_COPILOT'] || env['AI_ASSISTANT']) {
-			console.log(`✅ Found Copilot environment variables in creation options`);
+		if (copilotPatterns.some(pattern => optionsName.includes(pattern))) {
 			isCopilotTerminal = true;
 		}
 	}
 
-	console.log(`=== FINAL DECISION: ${isCopilotTerminal ? 'COPILOT' : 'STANDARD'} ===`);
+	// Check for existing Copilot-related environment variables
+	if (creationOptions && 'env' in creationOptions && creationOptions.env) {
+		const env = creationOptions.env;
+		if (env['COPILOT_AGENT'] || env['GITHUB_COPILOT'] || env['AI_ASSISTANT']) {
+			isCopilotTerminal = true;
+		}
+	}
 
-	// If this is identified as a Copilot terminal, track it
+	// Track identified Copilot terminals
 	if (isCopilotTerminal) {
 		copilotTerminals.add(terminal);
-		console.log(`✅ Copilot terminal detected: ${terminal.name}`);
-	} else {
-		console.log(`ℹ️  Standard terminal (not Copilot): ${terminal.name}`);
 	}
 
 	return isCopilotTerminal;
@@ -250,7 +184,6 @@ function detectCopilotTerminal(terminal: vscode.Terminal): boolean {
 function createAgentMarkerFile(terminal: vscode.Terminal) {
 	const processId = terminal.processId;
 	if (!processId) {
-		console.warn('Cannot create marker file: terminal process ID not available yet');
 		return;
 	}
 	
@@ -264,9 +197,8 @@ function createAgentMarkerFile(terminal: vscode.Terminal) {
 				terminalName: terminal.name,
 				timestamp: Date.now()
 			}));
-			console.log(`Created agent marker file for PID ${pid}: ${markerPath}`);
 		} catch (error) {
-			console.error(`Failed to create agent marker file for PID ${pid}:`, error);
+			console.error(`Failed to create marker file for PID ${pid}:`, error);
 		}
 	});
 }
@@ -277,7 +209,6 @@ function createAgentMarkerFile(terminal: vscode.Terminal) {
 function removeAgentMarkerFile(terminal: vscode.Terminal) {
 	const processId = terminal.processId;
 	if (!processId) {
-		console.warn('Cannot remove marker file: terminal process ID not available');
 		return;
 	}
 	
@@ -286,10 +217,9 @@ function removeAgentMarkerFile(terminal: vscode.Terminal) {
 		try {
 			if (fs.existsSync(markerPath)) {
 				fs.unlinkSync(markerPath);
-				console.log(`Removed agent marker file for PID ${pid}: ${markerPath}`);
 			}
 		} catch (error) {
-			console.error(`Failed to remove agent marker file for PID ${pid}:`, error);
+			console.error(`Failed to remove marker file for PID ${pid}:`, error);
 		}
 	});
 }
@@ -307,7 +237,6 @@ function removeAllAgentMarkerFiles() {
 			const filePath = path.join(tempDir, file);
 			try {
 				fs.unlinkSync(filePath);
-				console.log(`Removed agent marker file: ${filePath}`);
 			} catch (error) {
 				console.error(`Failed to remove marker file ${filePath}:`, error);
 			}
@@ -319,7 +248,5 @@ function removeAllAgentMarkerFiles() {
 
 // This method is called when your extension is deactivated
 export function deactivate() {
-	// Clean up marker files when extension is deactivated
 	removeAllAgentMarkerFiles();
-	console.log('Copilot Terminal Detection extension is being deactivated');
 }
