@@ -11,7 +11,8 @@ suite('Copilot Terminal Detection Test Suite', () => {
 	test('Extension commands should be registered', async () => {
 		const commands = await vscode.commands.getCommands(true);
 		assert.ok(commands.includes('copilot-terminal-detection.detectCopilot'));
-		assert.ok(commands.includes('copilot-terminal-detection.showEnvironment'));
+		assert.ok(commands.includes('copilot-terminal-detection.createMarker'));
+		assert.ok(commands.includes('copilot-terminal-detection.showStatus'));
 	});
 
 	test('Environment variable collection should be accessible', () => {
