@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> This can be replaced with a [VSCode configuration](https://github.com/ekroon/dotfiles/blob/b6e2066f6bd4ab14cad9e2b1d2dd735e494e0dcf/docs/vscode-configuration.md).
+
+
 # Copilot Terminal Detection
 
 [![Version](https://img.shields.io/visual-studio-marketplace/v/erwinkroon.copilot-terminal-detection)](https://marketplace.visualstudio.com/items?itemName=erwinkroon.copilot-terminal-detection)
