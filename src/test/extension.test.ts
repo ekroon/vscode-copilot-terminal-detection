@@ -5,21 +5,21 @@ suite('Copilot Terminal Detection Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
 
 	test('Extension should be present', () => {
-		assert.ok(vscode.extensions.getExtension('undefined_publisher.copilot-terminal-detection'));
+		assert.ok(vscode.extensions.getExtension('erwinkroon.copilot-terminal-detection'));
 	});
 
 	test('Extension commands should be registered', async () => {
 		const commands = await vscode.commands.getCommands(true);
 		assert.ok(commands.includes('copilot-terminal-detection.detectCopilot'));
-		assert.ok(commands.includes('copilot-terminal-detection.showEnvironment'));
+		assert.ok(commands.includes('copilot-terminal-detection.createMarker'));
+		assert.ok(commands.includes('copilot-terminal-detection.showStatus'));
 	});
 
-	test('Environment variable collection should be accessible', () => {
-		const extension = vscode.extensions.getExtension('undefined_publisher.copilot-terminal-detection');
+	test('Extension should be loadable', () => {
+		const extension = vscode.extensions.getExtension('erwinkroon.copilot-terminal-detection');
 		if (extension && extension.isActive) {
-			// Test that we can access the environment variable collection
-			// This tests that our extension can set environment variables
-			assert.ok(extension.exports || true); // Extension is loaded
+			// Extension is loaded and active
+			assert.ok(extension.exports || true);
 		}
 	});
 });

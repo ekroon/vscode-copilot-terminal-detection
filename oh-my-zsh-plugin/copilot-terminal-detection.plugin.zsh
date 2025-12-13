@@ -3,7 +3,7 @@
 # Detects if the current terminal is controlled by GitHub Copilot
 # Sets COPILOT_AGENT_DETECTED environment variable
 
-# Function to get the dynamic temp directory path
+# Get the dynamic temp directory path
 _copilot_get_temp_dir() {
     if command -v node >/dev/null 2>&1; then
         node -e "console.log(require('os').tmpdir())" 2>/dev/null
@@ -15,40 +15,34 @@ _copilot_get_temp_dir() {
                 return
             fi
         done
-        echo "/tmp"  # Final fallback
+        echo "/tmp"
     fi
 }
 
-# Function to check if current shell is running under a Copilot terminal
+# Check if current shell is running under a Copilot terminal
 _copilot_is_agent_terminal() {
     local temp_dir=$(_copilot_get_temp_dir)
     local current_pid=$$
     local parent_pid=$PPID
     
-    # First check if current process itself has a marker file
+    # Check current process marker file
     local marker_file="$temp_dir/.vscode_copilot_agent_$current_pid"
-    if [[ -f "$marker_file" ]]; then
-        if _copilot_validate_marker_file "$marker_file"; then
-            return 0
-        fi
+    if [[ -f "$marker_file" ]] && _copilot_validate_marker_file "$marker_file"; then
+        return 0
     fi
     
-    # Check if there's a marker file for any parent process in the process tree
+    # Walk up the process tree
     while [[ $parent_pid -gt 1 ]]; do
-        local marker_file="$temp_dir/.vscode_copilot_agent_$parent_pid"
+        marker_file="$temp_dir/.vscode_copilot_agent_$parent_pid"
         
-        if [[ -f "$marker_file" ]]; then
-            if _copilot_validate_marker_file "$marker_file"; then
-                return 0
-            fi
+        if [[ -f "$marker_file" ]] && _copilot_validate_marker_file "$marker_file"; then
+            return 0
         fi
         
-        # Move up the process tree
+        # Move to parent process
         if command -v ps >/dev/null 2>&1; then
             parent_pid=$(ps -o ppid= -p $parent_pid 2>/dev/null | tr -d ' ')
-            if [[ -z "$parent_pid" ]]; then
-                break
-            fi
+            [[ -z "$parent_pid" ]] && break
         else
             break
         fi
@@ -57,7 +51,7 @@ _copilot_is_agent_terminal() {
     return 1
 }
 
-# Function to validate marker file content
+# Validate marker file content
 _copilot_validate_marker_file() {
     local marker_file="$1"
     
@@ -73,7 +67,7 @@ _copilot_validate_marker_file() {
         " 2>/dev/null)
         [[ "$marker_valid" == "true" ]]
     else
-        # Fallback: just check if file contains expected content
+        # Fallback: check if file contains expected content
         grep -q '"isAgentSession":true' "$marker_file" 2>/dev/null
     fi
 }
@@ -87,5 +81,5 @@ if [[ -z "$COPILOT_AGENT_DETECTED" ]]; then
     fi
 fi
 
-# Clean up private functions to avoid polluting the namespace
+# Clean up private functions
 unset -f _copilot_get_temp_dir _copilot_is_agent_terminal _copilot_validate_marker_file
