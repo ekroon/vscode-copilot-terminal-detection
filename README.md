@@ -38,38 +38,11 @@ source ~/.zshrc
 ```
 
 ### 3. Enjoy the Magic! ✨
-- Open a Copilot terminal → See `🤖` indicators
+- Open a Copilot terminal → Automatically detected
 - Open a regular terminal → Normal behavior
 - Customize your experience with the environment variable
 
-Install the extension from the VS Code marketplace or package it locally:
-
-```bash
-npm install
-npm run compile
-npx vsce package
-code --install-extension copilot-terminal-detection-*.vsix
-```
-
-### 2. Install the Oh My Zsh Plugin
-
-1. Copy the plugin to your Oh My Zsh custom plugins directory:
-   ```bash
-   mkdir -p ~/.oh-my-zsh/custom/plugins/copilot-terminal-detection
-   cp oh-my-zsh-plugin/copilot-terminal-detection.plugin.zsh ~/.oh-my-zsh/custom/plugins/copilot-terminal-detection/
-   ```
-
-2. Add the plugin to your `~/.zshrc` file:
-   ```bash
-   plugins=(... copilot-terminal-detection)
-   ```
-
-3. Reload your shell:
-   ```bash
-   source ~/.zshrc
-   ```
-
-## Usage
+## 📖 Usage
 
 The plugin automatically sets the `COPILOT_AGENT_DETECTED` environment variable:
 

@@ -8,7 +8,7 @@ This VS Code extension automatically detects when GitHub Copilot is controlling 
 
 ### Core Features Implemented
 - ✅ **Automatic Terminal Detection**: Extension monitors `onDidOpenTerminal` events
-- ✅ **Environment Variable Setting**: Sets `IS_AGENT_SESSION=true` and `TERMINAL_MODE=agent`
+- ✅ **Environment Variable Setting**: Sets `COPILOT_AGENT_DETECTED=true` for agent terminals
 - ✅ **Pattern-Based Detection**: Identifies Copilot terminals by name patterns
 - ✅ **Shell Integration**: Provides ready-to-use shell configuration
 - ✅ **Manual Commands**: Includes debugging and testing commands
@@ -45,7 +45,7 @@ npm run compile
 Add to your `~/.zshrc` or `~/.bashrc`:
 ```bash
 # Agent detection using environment variables set by VS Code extension
-if [[ "$IS_AGENT_SESSION" == "true" ]] || [[ "$TERMINAL_MODE" == "agent" ]]; then
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
     export COPILOT_AGENT_DETECTED=true
     export PS1="[🤖] $PS1"
     echo "🤖 Agent-controlled terminal detected"
@@ -152,7 +152,7 @@ Potential improvements for future versions:
 ## 🎉 Success Criteria Met
 
 ✅ **Automatic Detection**: Extension detects Copilot terminals without user intervention
-✅ **Environment Variables**: Sets `IS_AGENT_SESSION=true` and `TERMINAL_MODE=agent`
+✅ **Environment Variables**: Sets `COPILOT_AGENT_DETECTED=true` for agent terminals
 ✅ **Shell Integration**: Provides working shell configuration
 ✅ **Zero Configuration**: Works out of the box after installation
 ✅ **Cross-Platform**: Compatible with macOS, Windows, and Linux
