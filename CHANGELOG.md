@@ -9,7 +9,7 @@ All notable changes to the "Copilot Terminal Detection" extension will be docume
 - 🔍 Automatic detection of GitHub Copilot controlled terminals
 - 🎯 Per-terminal detection using process-based marker files
 - 🐚 Complete Oh My Zsh plugin for seamless shell integration
-- ⚡ `COPILOT_AGENT_DETECTED` environment variable for shell customization
+- ⚡ Shell plugin sets `COPILOT_AGENT_DETECTED` environment variable for customization
 - 🛡️ Safe operation that won't break if extension isn't loaded
 - 📝 Comprehensive documentation and usage examples
 - 🎨 Custom icon and marketplace-ready packaging

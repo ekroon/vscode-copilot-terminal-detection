@@ -2,26 +2,26 @@
 
 ## 🎯 Project Overview
 
-This VS Code extension automatically detects when GitHub Copilot is controlling the terminal and sets environment variables that the shell can read to modify its behavior accordingly.
+This VS Code extension automatically detects when GitHub Copilot is controlling the terminal and creates marker files that the shell can read to modify its behavior accordingly.
 
 ## ✅ Implementation Status
 
 ### Core Features Implemented
 - ✅ **Automatic Terminal Detection**: Extension monitors `onDidOpenTerminal` events
-- ✅ **Environment Variable Setting**: Sets `IS_AGENT_SESSION=true` and `TERMINAL_MODE=agent`
+- ✅ **Marker File Creation**: Creates marker files for each Copilot terminal
 - ✅ **Pattern-Based Detection**: Identifies Copilot terminals by name patterns
-- ✅ **Shell Integration**: Provides ready-to-use shell configuration
+- ✅ **Shell Integration**: Oh My Zsh plugin sets `COPILOT_AGENT_DETECTED` environment variable
 - ✅ **Manual Commands**: Includes debugging and testing commands
 - ✅ **Cross-Platform Support**: Works on macOS, Windows, and Linux
 
 ### Technical Implementation
 - ✅ **TypeScript Extension**: Full TypeScript implementation with proper types
 - ✅ **VS Code API Integration**: Uses latest VS Code Extension API (v1.101.0)
-- ✅ **Environment Variable Collection**: Leverages `GlobalEnvironmentVariableCollection`
+- ✅ **Marker File System**: Creates process-based marker files for detection
 - ✅ **Event Handling**: Proper event subscription and cleanup
 - ✅ **Memory Management**: Uses WeakSet for efficient terminal tracking
 - ✅ **Error Handling**: Comprehensive error handling and logging
-- ✅ **Testing**: Complete test suite with Jest
+- ✅ **Testing**: Complete test suite
 
 ### Documentation & Examples
 - ✅ **README.md**: Comprehensive documentation with installation and usage
@@ -44,9 +44,11 @@ npm run compile
 ### 2. Shell Configuration
 Add to your `~/.zshrc` or `~/.bashrc`:
 ```bash
-# Agent detection using environment variables set by VS Code extension
-if [[ "$IS_AGENT_SESSION" == "true" ]] || [[ "$TERMINAL_MODE" == "agent" ]]; then
-    export COPILOT_AGENT_DETECTED=true
+# Load Oh My Zsh plugin (which detects marker files and sets COPILOT_AGENT_DETECTED)
+plugins=(... copilot-terminal-detection)
+
+# Then use the environment variable set by the plugin
+if [[ "$COPILOT_AGENT_DETECTED" == "true" ]]; then
     export PS1="[🤖] $PS1"
     echo "🤖 Agent-controlled terminal detected"
 fi
@@ -78,8 +80,8 @@ The extension identifies Copilot terminals by checking for these patterns in ter
 1. **Terminal Creation**: VS Code creates a new terminal
 2. **Event Trigger**: Extension receives `onDidOpenTerminal` event
 3. **Pattern Matching**: Extension analyzes terminal name and options
-4. **Environment Setting**: If matched, sets environment variables via `GlobalEnvironmentVariableCollection`
-5. **Shell Detection**: Shell reads environment variables on startup
+4. **Marker File Creation**: If matched, creates marker file with terminal process ID
+5. **Shell Plugin Detection**: Oh My Zsh plugin detects marker files and sets `COPILOT_AGENT_DETECTED`
 6. **Behavior Modification**: Shell modifies prompt, aliases, and behavior
 
 ## 🎮 Available Commands
@@ -87,7 +89,8 @@ The extension identifies Copilot terminals by checking for these patterns in ter
 | Command | Description |
 |---------|-------------|
 | `Copilot Terminal Detection: Detect Copilot Terminal` | Manually detect if active terminal is from Copilot |
-| `Copilot Terminal Detection: Show Environment Variables` | Display current environment variables set by extension |
+| `Copilot Terminal Detection: Create Marker File` | Manually create a marker file for testing |
+| `Copilot Terminal Detection: Show Marker File Status` | Display current marker files and their status |
 
 ## 📁 Project Structure
 
@@ -152,8 +155,8 @@ Potential improvements for future versions:
 ## 🎉 Success Criteria Met
 
 ✅ **Automatic Detection**: Extension detects Copilot terminals without user intervention
-✅ **Environment Variables**: Sets `IS_AGENT_SESSION=true` and `TERMINAL_MODE=agent`
-✅ **Shell Integration**: Provides working shell configuration
+✅ **Marker Files**: Creates marker files for file-based detection by shell plugins
+✅ **Shell Integration**: Oh My Zsh plugin sets `COPILOT_AGENT_DETECTED` environment variable
 ✅ **Zero Configuration**: Works out of the box after installation
 ✅ **Cross-Platform**: Compatible with macOS, Windows, and Linux
 ✅ **Documentation**: Comprehensive guides and examples provided
